@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Live Weather{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="eyebrow">API Integration</div>
+      <h2>Fetch Live Weather Data</h2>
+    </div>
+    <a href="/dashboard" class="btn btn-outline">← Dashboard</a>
+  </div>
+
+  <div class="card" style="max-width:520px">
+
+    <div class="api-badge">OpenWeatherMap API · /data/2.5/weather</div>
+
+    <p style="color:var(--text-muted); font-size:.85rem; margin-bottom:24px; line-height:1.7">
+      Select a city to fetch real-time temperature and humidity from the
+      OpenWeatherMap API. The data will be saved directly to the database.
+    </p>
+
+    <form method="POST" action="/fetch_live">
+
+      <div class="form-group" style="margin-bottom:24px">
+        <label for="city">Select City</label>
+        <select id="city" name="city">
+          {% for city in cities %}
+            <option value="{{ city }}">{{ city }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- API endpoint preview -->
+      <div style="background:var(--bg-input); border:1px solid var(--border);
+                  border-radius:var(--radius); padding:14px 16px; margin-bottom:24px">
+        <div style="font-size:.65rem; letter-spacing:.15em; color:var(--accent);
+                    text-transform:uppercase; margin-bottom:6px">Request URL</div>
+        <code style="font-size:.72rem; color:var(--text-muted); word-break:break-all">
+          GET /data/2.5/weather?q=<span style="color:var(--accent-2)">{city}</span>&units=metric&appid=<span style="color:var(--warn)">API_KEY</span>
+        </code>
+      </div>
+
+      <!-- What gets saved -->
+      <div style="background:var(--bg-input); border:1px solid var(--border);
+                  border-radius:var(--radius); padding:14px 16px; margin-bottom:24px;
+                  font-size:.78rem; color:var(--text-muted); line-height:1.9">
+        <div style="font-size:.65rem; letter-spacing:.15em; color:var(--accent);
+                    text-transform:uppercase; margin-bottom:8px">Fields Saved to DB</div>
+        country &nbsp;·&nbsp; region &nbsp;·&nbsp; date &nbsp;·&nbsp;
+        temperature &nbsp;·&nbsp; rainfall &nbsp;·&nbsp; humidity
+        <div style="margin-top:4px; color:var(--text-dim)">
+          (co2 = 400 ppm placeholder — no free real-time CO₂ API)
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-success" style="width:100%">
+        Fetch &amp; Save to Database →
+      </button>
+
+    </form>
+  </div>
+
+</div>
+{% endblock %}

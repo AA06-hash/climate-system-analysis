@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="eyebrow">Overview</div>
+      <h2>Climate Data Dashboard</h2>
+    </div>
+    <a href="/add" class="btn btn-primary">+ Add Record</a>
+  </div>
+
+  <!-- Stats row -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Records</div>
+      <div class="stat-value">{{ stats.total_records or 0 }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg Temperature</div>
+      <div class="stat-value">{{ stats.avg_temp or '—' }}<span>°C</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg CO₂</div>
+      <div class="stat-value">{{ stats.avg_co2 or '—' }}<span> ppm</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg Humidity</div>
+      <div class="stat-value">{{ stats.avg_humidity or '—' }}<span>%</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Countries</div>
+      <div class="stat-value">{{ stats.total_countries or 0 }}</div>
+    </div>
+  </div>
+
+  <!-- Data table -->
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Country</th>
+            <th>Region</th>
+            <th>Date</th>
+            <th>Temp °C</th>
+            <th>Rainfall mm</th>
+            <th>CO₂ ppm</th>
+            <th>Humidity %</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in records %}
+          <tr>
+            <td style="color:var(--text-dim); font-family:var(--font-mono)">{{ r.id }}</td>
+            <td><strong>{{ r.country }}</strong></td>
+            <td style="color:var(--text-muted)">{{ r.region }}</td>
+            <td style="font-family:var(--font-mono); font-size:.78rem">{{ r.date }}</td>
+
+            {# Temperature badge #}
+            <td>
+              {% if r.temperature > 35 %}
+                <span class="badge badge-hot">{{ r.temperature }}°</span>
+              {% elif r.temperature > 25 %}
+                <span class="badge badge-warm">{{ r.temperature }}°</span>
+              {% elif r.temperature > 15 %}
+                <span class="badge badge-mild">{{ r.temperature }}°</span>
+              {% else %}
+                <span class="badge badge-cool">{{ r.temperature }}°</span>
+              {% endif %}
+            </td>
+
+            <td>{{ r.rainfall }}</td>
+            <td style="{% if r.co2 and r.co2 > 410 %}color:var(--warn){% endif %}">
+              {{ r.co2 if r.co2 else '—' }}
+            </td>
+            <td>{{ r.humidity }}%</td>
+            <td>
+              <a href="/update/{{ r.id }}" class="btn btn-outline btn-sm">Edit</a>
+              <a href="/delete/{{ r.id }}" class="btn btn-danger btn-sm"
+                 onclick="return confirm('Delete this record?')">Del</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="9" style="text-align:center; color:var(--text-muted); padding:32px">
+              No records yet. <a href="/add">Add the first one →</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

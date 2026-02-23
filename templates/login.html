@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">Research Platform v3.0</div>
+    <h1>Climate Research<br>Management System</h1>
+    <div class="subtitle">Secure Researcher Portal</div>
+
+    <form method="POST" action="/">
+      <div class="login-fields">
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email"
+                 placeholder="researcher@climate.org" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password"
+                 placeholder="••••••••" required>
+        </div>
+
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%">
+        Access System →
+      </button>
+    </form>
+
+    <div class="demo-hint">
+      <strong>Demo credentials</strong><br>
+      admin@climate.org &nbsp;/&nbsp; admin123<br>
+      staff@climate.org &nbsp;/&nbsp; staff123
+    </div>
+
+    <div style="text-align:center; margin-top:16px; font-size:.8rem; color:var(--text-muted)">
+      No account? <a href="/register" style="color:var(--accent)">Register here →</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Add Record{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="eyebrow">Insert</div>
+      <h2>Add Climate Record</h2>
+    </div>
+    <a href="/dashboard" class="btn btn-outline">← Back</a>
+  </div>
+
+  <div class="card" style="max-width:680px">
+    <form method="POST" action="/add">
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="country">Country</label>
+          <input type="text" id="country" name="country"
+                 placeholder="e.g. India" required>
+        </div>
+
+        <div class="form-group">
+          <label for="region">Region</label>
+          <input type="text" id="region" name="region"
+                 placeholder="e.g. Tamil Nadu" required>
+        </div>
+
+        <div class="form-group">
+          <label for="date">Date</label>
+          <input type="date" id="date" name="date" required>
+        </div>
+
+        <div class="form-group">
+          <label for="temperature">Temperature (°C)</label>
+          <input type="number" id="temperature" name="temperature"
+                 step="0.1" placeholder="e.g. 32.5" required>
+        </div>
+
+        <div class="form-group">
+          <label for="rainfall">Rainfall (mm)</label>
+          <input type="number" id="rainfall" name="rainfall"
+                 step="0.1" min="0" placeholder="e.g. 12.3" required>
+        </div>
+
+        <div class="form-group">
+          <label for="co2">CO₂ (ppm)</label>
+          <input type="number" id="co2" name="co2"
+                 step="0.1" placeholder="e.g. 415.2" required>
+        </div>
+
+        <div class="form-group">
+          <label for="humidity">Humidity (%)</label>
+          <input type="number" id="humidity" name="humidity"
+                 step="0.1" min="0" max="100" placeholder="e.g. 78" required>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save Record →</button>
+        <a href="/dashboard" class="btn btn-outline">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+{% endblock %}

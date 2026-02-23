@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="login-wrap">
+  <div class="login-card" style="max-width:440px">
+    <div class="login-logo">Create Account</div>
+    <h1>Join the<br>Research Platform</h1>
+    <div class="subtitle">Register a new researcher account</div>
+
+    <form method="POST" action="/register">
+      <div class="login-fields">
+
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name"
+                 placeholder="Dr. Your Name" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email"
+                 placeholder="you@climate.org" required>
+        </div>
+
+        <div class="form-group">
+          <label for="role">Role</label>
+          <select id="role" name="role">
+            <option value="viewer">Viewer</option>
+            <option value="staff">Staff</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password"
+                 placeholder="Min. 6 characters" required>
+        </div>
+
+        <div class="form-group">
+          <label for="confirm">Confirm Password</label>
+          <input type="password" id="confirm" name="confirm"
+                 placeholder="Repeat password" required>
+        </div>
+
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%">
+        Create Account →
+      </button>
+    </form>
+
+    <div style="text-align:center; margin-top:16px; font-size:.8rem; color:var(--text-muted)">
+      Already have an account? <a href="/" style="color:var(--accent)">Log in →</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+
+{% block head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="eyebrow">Analytics</div>
+      <h2>Climate Report by Country</h2>
+    </div>
+    <a href="/dashboard" class="btn btn-outline">← Dashboard</a>
+  </div>
+
+  <!-- ── Chart tabs ── -->
+  <div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap">
+    <button class="btn btn-primary btn-sm chart-tab" data-chart="temp">🌡 Temperature</button>
+    <button class="btn btn-outline btn-sm chart-tab" data-chart="co2">💨 CO₂</button>
+    <button class="btn btn-outline btn-sm chart-tab" data-chart="humidity">💧 Humidity</button>
+    <button class="btn btn-outline btn-sm chart-tab" data-chart="rainfall">🌧 Rainfall</button>
+  </div>
+
+  <!-- ── Chart card ── -->
+  <div class="card" style="margin-bottom:24px; padding:28px">
+    <div style="position:relative; height:300px">
+      <canvas id="climateChart"></canvas>
+    </div>
+  </div>
+
+  <!-- SQL hint -->
+  <div class="card" style="margin-bottom:20px; padding:14px 20px">
+    <code style="font-size:.72rem; color:var(--text-muted)">
+      SELECT country, AVG(temperature), AVG(co2), AVG(humidity), AVG(rainfall), COUNT(*)
+      FROM climate_data GROUP BY country ORDER BY avg_temp DESC
+    </code>
+  </div>
+
+  <!-- ── Data table ── -->
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Country</th>
+            <th>Avg Temp °C</th>
+            <th>Avg CO₂ ppm</th>
+            <th>Avg Humidity %</th>
+            <th>Avg Rainfall mm</th>
+            <th>Records</th>
+            <th>Heat Level</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in report %}
+          <tr>
+            <td><strong>{{ r.country }}</strong></td>
+            <td>
+              {% set t = r.avg_temp | float %}
+              {% if t > 35 %}
+                <span class="badge badge-hot">{{ r.avg_temp }}°</span>
+              {% elif t > 25 %}
+                <span class="badge badge-warm">{{ r.avg_temp }}°</span>
+              {% elif t > 15 %}
+                <span class="badge badge-mild">{{ r.avg_temp }}°</span>
+              {% else %}
+                <span class="badge badge-cool">{{ r.avg_temp }}°</span>
+              {% endif %}
+            </td>
+            <td style="{% if r.avg_co2 and r.avg_co2|float > 410 %}color:var(--warn){% endif %}">
+              {{ r.avg_co2 if r.avg_co2 else '—' }}
+            </td>
+            <td>{{ r.avg_humidity }}%</td>
+            <td>{{ r.avg_rainfall }} mm</td>
+            <td style="font-family:var(--font-mono)">{{ r.total_rows }}</td>
+            <td>
+              {% set t = r.avg_temp | float %}
+              {% set bar_w = [t * 1.8, 120] | min %}
+              {% set bar_color = '#ff4d4d' if t > 35 else ('#ffaa33' if t > 25 else ('#33dd88' if t > 15 else '#2d7eff')) %}
+              <div class="temp-bar-wrap">
+                <div class="temp-bar" style="width:{{ bar_w }}px; background:{{ bar_color }}"></div>
+                <span style="font-size:.7rem; color:var(--text-muted)">
+                  {{ 'Critical' if t > 35 else ('High' if t > 25 else ('Moderate' if t > 15 else 'Cool')) }}
+                </span>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px">
+              No data available yet.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let chartData = null;
+let chart     = null;
+
+const CHART_CONFIGS = {
+  temp:     { key: 'temperature', label: 'Avg Temperature (°C)',  color: '#ff6b6b', bg: 'rgba(255,107,107,.18)' },
+  co2:      { key: 'co2',         label: 'Avg CO₂ (ppm)',         color: '#ffbb44', bg: 'rgba(255,187,68,.18)'  },
+  humidity: { key: 'humidity',    label: 'Avg Humidity (%)',       color: '#2d7eff', bg: 'rgba(45,126,255,.18)'  },
+  rainfall: { key: 'rainfall',    label: 'Avg Rainfall (mm)',      color: '#00c9a7', bg: 'rgba(0,201,167,.18)'   },
+};
+
+async function loadChart(type) {
+  if (!chartData) {
+    const res = await fetch('/chart_data');
+    chartData = await res.json();
+  }
+  const cfg = CHART_CONFIGS[type];
+  const ctx = document.getElementById('climateChart').getContext('2d');
+  if (chart) chart.destroy();
+
+  chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: chartData.labels,
+      datasets: [{
+        label:           cfg.label,
+        data:            chartData[cfg.key],
+        backgroundColor: chartData.labels.map(() => cfg.bg),
+        borderColor:     chartData.labels.map(() => cfg.color),
+        borderWidth: 2,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#4a7aaa', font: { family: "'Sora',sans-serif", size: 12 } } },
+        tooltip: {
+          backgroundColor: '#0d1a30', borderColor: '#1a3358', borderWidth: 1,
+          titleColor: '#d4e8ff', bodyColor: '#4a7aaa',
+        }
+      },
+      scales: {
+        x: { ticks: { color:'#4a7aaa' }, grid: { color:'rgba(26,51,88,.4)' } },
+        y: { ticks: { color:'#4a7aaa' }, grid: { color:'rgba(26,51,88,.4)' }, beginAtZero: false }
+      }
+    }
+  });
+}
+
+document.querySelectorAll('.chart-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.chart-tab').forEach(b => {
+      b.classList.remove('btn-primary');
+      b.classList.add('btn-outline');
+    });
+    btn.classList.add('btn-primary');
+    btn.classList.remove('btn-outline');
+    loadChart(btn.dataset.chart);
+  });
+});
+
+loadChart('temp');
+</script>
+{% endblock %}

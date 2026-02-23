@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Researchers{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="eyebrow">Users</div>
+      <h2>Registered Researchers</h2>
+    </div>
+    <a href="/dashboard" class="btn btn-outline">← Dashboard</a>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td style="color:var(--text-dim); font-family:var(--font-mono)">{{ u.id }}</td>
+            <td><strong>{{ u.name }}</strong></td>
+            <td style="color:var(--text-muted)">{{ u.email }}</td>
+            <td>
+              <span class="badge badge-{{ u.role }}">{{ u.role }}</span>
+            </td>
+            <td>
+              {% if u.name == session.user %}
+                <span class="badge badge-mild">● Active</span>
+              {% else %}
+                <span style="color:var(--text-dim); font-size:.75rem">○ Offline</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" style="text-align:center; color:var(--text-muted); padding:32px">
+              No researchers found.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
